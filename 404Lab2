@@ -1,0 +1,60 @@
+1.
+In the following line of code:
+
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+the option "socket.SOCK_STREAM" specifies TCP protocol.  If the option
+"socket.SOCK_DGRAM" were used instead, it would be an UDP socket.
+
+2.
+
+The main difference is that a client socket is opened to connect to another
+host, to send/receive some information, then to close, whereas the server opens
+a socket and must keep it open while listening to accept new connections.  The client
+is initiating the connection:
+
+s.connect(addr)
+s.sendall(payload.encode())
+s.shutdown(socket.SHUT_WR) 
+
+while the server is listening to accept new connections:
+
+proxy_start.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+proxy_start.bind((HOST, PORT))
+proxy_start.listen(1)
+
+The difference is illustrated with the "listen" command, where the server listens
+for incoming connections while the client just connects.
+
+3.
+
+In the following line of code:
+
+s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+The option "socket.SO_REUSEADDR" instructs the OS to allow us to reuse the port.
+
+4.
+
+We receive a connection object as well as the address connecting to us, as shown:
+
+conn, addr = s.accept()
+
+where conn is the connection, and addr is the client address.
+
+We can then use the connection object to receive the payload from the client.
+
+5.
+
+full_Data = conn.recv(BUFFER_SIZE)
+time.sleep(0.5)
+conn.sendall(full_Data)
+conn.close()
+
+The server receives the message passed ("Foobar")
+and sends it back to the client.  This means the entirety 
+of the message the client receives back is "Foobar".
+
+6.
+
+https://github.com/Dan767/404Lab2
