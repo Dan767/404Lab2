@@ -1,0 +1,55 @@
+import socket, sys
+buffer_size = 8192
+def create_tcp_socket():
+    print('Creating socket')
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    except (socket.error, msg):
+        sys.exit()
+    print('Socket created successfully!')
+    return s
+
+def get_remote_ip(host):
+    try:
+        remote_ip = socket.gethostbyname( host )
+    except socket.gaierror:
+        print( 'Hostname could not be resolved')
+        sys.exit()
+    return remote_ip
+
+def send_data(serversocket, payload):
+    print('Sending payload')
+    try:
+        serversocket.sendall(payload.encode())
+    except socket.error:
+        print('Send failed')
+        sys.exit()
+    print('Payload sent successfully')
+
+
+def main():
+    try:
+        host = 'www.google.com'
+        port = 80
+        payload = 'GET / HTTP/1.0\r\nHost:'+host+'\r\n\r\n'
+        s = create_tcp_socket()
+        remote_ip = get_remote_ip(host)
+        s.connect((remote_ip, port))
+        send_data(s, payload)
+        s.shutdown(socket.SHUT_WR)
+        full_data = ''
+
+        while(True):
+            data = s.recv(buffer_size)
+            if not data:
+                break
+            full_data += str(data)
+        print(full_data)
+    except Exception as e:
+        print(e)
+    finally:
+        s.close()
+if __name__ == '__main__':
+    main()
+
+ 
